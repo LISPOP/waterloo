@@ -53,6 +53,23 @@ summarize(recent_average=mean(party_percent))->recent_results
 
 #### Get the Wikipedia data on polls ####
 #Uncomment if you need to install rvest
-#install.packages('rvest')
+install.packages('rvest')
 #load the library
 library(rvest)
+
+##Read the HTML from Wiki Article
+Ontario_Polling <-read_html("https://en.wikipedia.org/wiki/43rd_Ontario_general_election")
+
+tables <- Ontario_Polling %>% html_table(fill = TRUE)
+
+##Input the seventh table, which is the one including the polling data
+seventh_table <-tables [[7]]
+
+##install janitor to clean up heading names
+install.packages("janitor")
+library(janitor)
+
+##Clean up heading names
+seventh_table <- seventh_table %>% clean_names()
+names(seventh_table)
+
