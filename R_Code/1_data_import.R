@@ -59,7 +59,7 @@ library(rvest)
 
 #### Get the Wikipedia data on polls ####
 #Uncomment if you need to install rvest
-install.packages('rvest')
+#install.packages('rvest')
 #load the library
 library(rvest)
 
@@ -69,36 +69,59 @@ Ontario_Polling <-read_html("https://en.wikipedia.org/wiki/43rd_Ontario_general_
 tables <- Ontario_Polling %>% html_table(fill = TRUE)
 
 ##Input the seventh table, which is the one including the polling data
-seventh_table <-tables [[7]]
+polls <-tables [[7]]
 
 ##install janitor to clean up heading names
 #install.packages("janitor")
 library(janitor)
 
 ##Clean up heading names
-seventh_table <- seventh_table %>% clean_names()
-names(seventh_table)
+polls <-polls %>% clean_names()
+names(polls)
 
 ##create a new table that removes misc rows (Leadership change, etc.)
-formatted_table <- seventh_table[-c(34,59, 61, 62, 63), ]
+polls <- polls[-c(34,59, 61, 62, 63), ]
+#### Simon speaking
+#### If we do the formatting on the original poll table, then we
+#### don't have to do that anymore on the gathered table. 
+#### We may use this poll table for something else, e.g. merge
+#### With our poll data to test how the Waterloo Region poll compares
+#### It would be nice to keep the wide table in a wide format. 
+#### Then format
+##convert date to yyyy-mm-dd format
+polls %>%
+  mutate(last_date_of_polling= mdy(last_date_of_polling
+  ))->polls
+
+#Convert all vote shares to numbers
+#Start with dataframe
+polls %>% 
+  #mutate(across(), function) applies a function to each variable
+  #listed in across
+  #?across
+  mutate(across(c(pc:other, sample_size, lead), as.numeric))->polls
+str(polls)
+#Now work on the margin_of_error 
+polls$margin_of_error
+#Yuck
+str_remove_all(polls$margin_of_error, "±|%|N/A")
+#save 
+polls$margin_of_error<-str_remove_all(polls$margin_of_error, "±|%|N/A")
+#Turn to a number
+polls$margin_of_error<-as.numeric(polls$margin_of_error)
+#Now we will be able to use that perhaps to show a band of the confidence intervals. Who knows. 
 
 ##create long table by party and vote share
-table_long <- gather (formatted_table, party, vote_share, pc:other, factor_key = TRUE)
-table_long
+polls_long <- gather (polls, party, vote_share, pc:other, factor_key = TRUE)
+polls_long
+library(lubridate)
 
-##convert date to yyyy-mm-dd format
-table_long %>%
-  mutate(last_date_of_polling = mdy(last_date_of_polling))
 
-##Convert vote share to a numeric value
-table_long$vote_share <- as.numeric(table_long$vote_share)
-
-##convert date to yyyy-mm-dd format
-table_long %>%
-  mutate(last_date_of_polling= mdy(last_date_of_polling))
 
 library(ggplot2)
 library(dplyr)
-
+table_long
 ggplot(table_long, aes(x=last_date_of_polling, y=vote_share, group=party, color=party)) +
-  geom_line() + scale_x_date(date_breaks="1 month", date_labels = "%m")
+  geom_line() + scale_x_date(date_breaks="4 month", date_labels = "%B")
+
+
