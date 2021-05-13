@@ -56,3 +56,49 @@ summarize(recent_average=mean(party_percent))->recent_results
 #install.packages('rvest')
 #load the library
 library(rvest)
+
+#### Get the Wikipedia data on polls ####
+#Uncomment if you need to install rvest
+install.packages('rvest')
+#load the library
+library(rvest)
+
+##Read the HTML from Wiki Article
+Ontario_Polling <-read_html("https://en.wikipedia.org/wiki/43rd_Ontario_general_election")
+
+tables <- Ontario_Polling %>% html_table(fill = TRUE)
+
+##Input the seventh table, which is the one including the polling data
+seventh_table <-tables [[7]]
+
+##install janitor to clean up heading names
+#install.packages("janitor")
+library(janitor)
+
+##Clean up heading names
+seventh_table <- seventh_table %>% clean_names()
+names(seventh_table)
+
+##create a new table that removes misc rows (Leadership change, etc.)
+formatted_table <- seventh_table[-c(34,59, 61, 62, 63), ]
+
+##create long table by party and vote share
+table_long <- gather (formatted_table, party, vote_share, pc:other, factor_key = TRUE)
+table_long
+
+##convert date to yyyy-mm-dd format
+table_long %>%
+  mutate(last_date_of_polling = mdy(last_date_of_polling))
+
+##Convert vote share to a numeric value
+table_long$vote_share <- as.numeric(table_long$vote_share)
+
+##convert date to yyyy-mm-dd format
+table_long %>%
+  mutate(last_date_of_polling= mdy(last_date_of_polling))
+
+library(ggplot2)
+library(dplyr)
+
+ggplot(table_long, aes(x=last_date_of_polling, y=vote_share, group=party, color=party)) +
+  geom_line() + scale_x_date(date_breaks="1 month", date_labels = "%m")
