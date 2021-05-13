@@ -1,0 +1,37 @@
+---
+title: "Summary of Waterloo Region Vote Intention, Spring 2021"
+author: 
+  - "Simon J. Kiss"
+date: "05/05/2021"
+output: pdf_document
+---
+
+```{r setup, include=T, echo=F, results="hide", message=F, warning=F}
+knitr::opts_chunk$set(echo = TRUE, echo=F, results="hide", message=F, warning=F, fig.width=6, fig.height=2)
+
+```
+
+```{r run-code}
+library(here)
+source('4_analysis.R')
+```
+
+## Introduction
+
+## Federal Vote
+```{r federal_vote_intention_2019_result}
+federal_vote_intention_2019_result
+```
+
+```{r federal_vote_intention_2019_historic}
+federal_vote_intention_historic_average
+```
+
+## Provincial Vote
+```{r}
+provincial_vote_intention_2019_result
+```
+
+```{r}
+provincial_vote_intention_historic_average
+```
