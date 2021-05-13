@@ -57,12 +57,6 @@ summarize(recent_average=mean(party_percent))->recent_results
 #load the library
 library(rvest)
 
-#### Get the Wikipedia data on polls ####
-#Uncomment if you need to install rvest
-#install.packages('rvest')
-#load the library
-library(rvest)
-
 ##Read the HTML from Wiki Article
 Ontario_Polling <-read_html("https://en.wikipedia.org/wiki/43rd_Ontario_general_election")
 
@@ -117,7 +111,7 @@ polls_long
 library(lubridate)
 
 
-
+#### Checking poll data #### 
 library(ggplot2)
 library(dplyr)
 table_long
