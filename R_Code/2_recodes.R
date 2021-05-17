@@ -30,10 +30,9 @@ waterloo$vote_provincial<-factor(waterloo$vote_provincial, levels=c("PC", "Liber
 ## Running this code will install all the Canada Election Studies data from my personal package
 ## It's not a huge deal, it can be convenient, even, but be warned. 
 ##This line installs the packages
-install.packages("devtools")
-install.packages("tidyverse")
-library("devtools") 
-devtools::install_github("sjkiss/cesdata")
+#install.packages("devtools")
+#install.packages("tidyverse")
+#devtools::install_github("sjkiss/cesdata")
 ## This line loads the library
 library(cesdata)
 ## This line loads the ces2019 web survey
@@ -95,7 +94,7 @@ mutate(ideology1=case_when(
    K1=="The Green Party" ~ 1.5,
    K1=="The Liberal Party" ~ 2,
    K1=="The Conservative Party" ~ 3),
-)
+)->waterloo
  
 ## Now do ideology 2
  waterloo %>% 
@@ -104,7 +103,7 @@ mutate(ideology1=case_when(
      K2=="The Green Party" ~ 1.5,
      K2=="The Liberal Party" ~ 2,
      K2=="The Conservative Party" ~ 3),
-) 
+) ->waterloo
 ##Now do ideology 3
  waterloo %>% 
    mutate(ideology3=case_when(
@@ -112,7 +111,7 @@ mutate(ideology1=case_when(
      K4=="The Green Party" ~ 1.5,
      K4=="The Liberal Party" ~ 2,
      K4=="The Progressive Conservative Party" ~ 3),
-   )
+   )->waterloo
 
 ## Now do ideology 4
 # ideology4=case_when(
@@ -125,7 +124,20 @@ mutate(ideology1=case_when(
      K5=="The Green Party" ~ 1.5,
      K5=="The Liberal Party" ~ 2,
      K5=="The Progressive Conservative Party" ~ 3),
-   )
+   )->waterloo
+ 
+names(waterloo)
+#Create Ideology Variable
+
+waterloo %>% 
+  rowwise() %>% 
+  mutate(ideology=mean(c_across(cols=num_range('ideology', 1:4))), na.rm=T)->waterloo
+waterloo$ideology
+
+#### Vaccine Hesitancy #### 
+
+waterloo %>% 
+  mutate(hesitant=case_when())
 ####Apply Weights#### 
 #The final data-set will have a variable like this.
 #The file has to be weighted to demographic data 

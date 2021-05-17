@@ -169,6 +169,10 @@ waterloo2 %>%
 
 ggsave(filename=here("Plots", "covid_assessment_by_2018_vote_provincial.png"))
 
+#### Correlate Ideology With Vaccine hesitancy #### 
+# look_for(waterloo, "vaccine")
+# levels(waterloo$K7)
+# ggplot(., aes(x=ideology,y=))
 #### Demographics#### 
 var_label(waterloo)
 

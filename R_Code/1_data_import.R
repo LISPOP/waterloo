@@ -1,3 +1,15 @@
+#install necessary packages
+#these are the pakcages necessary to run the code
+
+to.install<-c('tidyverse', 'labelled', 'haven', 'here', 'srvyr', 'survey', 'lubridate', 'readr', 'readxl', 'rvest', 'janitor', 'remotes')
+#This checks to see if these packages are installed.
+new.packages <- to.intsall[!(to.install %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+#These packages *may* cause difficulty for people running R 4.0 on Windows. PLease contact Simon Kiss if that's the case
+
+remotes::install_github('sjkiss/wlucolors')
+remotes::install_github('sjkiss/cesdata')
 #load libraries
 library(tidyverse)
 library(labelled)
@@ -8,7 +20,7 @@ library(here)
 waterloo<-read_sav(here("data/WRMS2021_autotest.sav"))
 waterloo<-as_factor(waterloo)
 str(waterloo)
-
+?read_excel
 
 #Genreate fake weight data
 #There will be  a weight variable like this 
@@ -83,6 +95,7 @@ polls <- polls[-c(34,59, 61, 62, 63), ]
 #### It would be nice to keep the wide table in a wide format. 
 #### Then format
 ##convert date to yyyy-mm-dd format
+library(lubridate)
 polls %>%
   mutate(last_date_of_polling= mdy(last_date_of_polling
   ))->polls
@@ -108,14 +121,13 @@ polls$margin_of_error<-as.numeric(polls$margin_of_error)
 ##create long table by party and vote share
 polls_long <- gather (polls, party, vote_share, pc:other, factor_key = TRUE)
 polls_long
-library(lubridate)
 
 
 #### Checking poll data #### 
 library(ggplot2)
 library(dplyr)
-table_long
-ggplot(table_long, aes(x=last_date_of_polling, y=vote_share, group=party, color=party)) +
+polls_long
+ggplot(polls_long, aes(x=last_date_of_polling, y=vote_share, group=party, color=party)) +
   geom_line() + scale_x_date(date_breaks="4 month", date_labels = "%B")
 
 
