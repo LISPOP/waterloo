@@ -1,6 +1,6 @@
 source("R_Code/3_set_theme.R")
 #### Load wlucolors package #### 
-#remotes::install_github('sjkiss/wlucolors', force=T)
+remotes::install_github('sjkiss/wlucolors', force=T)
 library(wlucolors)
 
 #### 2021 Federal Support By Federal History #### 
@@ -94,7 +94,7 @@ waterloo2 %>%
   scale_fill_mine()+scale_y_discrete(limits=rev)
 ggsave(here("Plots", "vote_intention_provincial_historic_average.png"), width=6,height=3)
 
-#### 2021 Provincial Support by 2018 rEsult #### 
+#### 2021 Provincial Support by 2018 Result #### 
 waterloo2 %>% 
   #form groups of the 2019 federal vote
   group_by(vote_provincial) %>% 
@@ -170,9 +170,9 @@ waterloo2 %>%
 ggsave(filename=here("Plots", "covid_assessment_by_2018_vote_provincial.png"))
 
 #### Correlate Ideology With Vaccine hesitancy #### 
-# look_for(waterloo, "vaccine")
-# levels(waterloo$K7)
-# ggplot(., aes(x=ideology,y=))
+ look_for(waterloo, "vaccine")
+ levels(waterloo$K7)
+ ggplot(., aes(x=ideology,y=hesitant))
 #### Demographics#### 
 var_label(waterloo)
 

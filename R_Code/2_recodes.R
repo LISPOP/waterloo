@@ -114,10 +114,6 @@ mutate(ideology1=case_when(
    )->waterloo
 
 ## Now do ideology 4
-# ideology4=case_when(
-# K4==" ~ ,
-# )
-#)
  waterloo %>% 
    mutate(ideology4=case_when(
      K5=="The New Democratic Party" ~ 1,
@@ -135,9 +131,20 @@ waterloo %>%
 waterloo$ideology
 
 #### Vaccine Hesitancy #### 
-
+# look up the levels for vaccine hesitancy question
+levels(waterloo$K7)
+# recoding answers
 waterloo %>% 
-  mutate(hesitant=case_when())
+  mutate(hesitant=case_when(
+    K7=="I certainly won't take it" ~ 1,
+    K7=="I have already declined receiving it" ~ 1,
+    K7=="I probably won't take it" ~ 0.67,
+    K7=="I am not sure" ~ 0.5,
+    K7=="I probably will take it" ~ 0.33,
+    K7==" I certainly will take it" ~ 0,
+    K7=="I have already received it" ~ 0),
+  )->waterloo
+
 ####Apply Weights#### 
 #The final data-set will have a variable like this.
 #The file has to be weighted to demographic data 

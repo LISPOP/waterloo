@@ -1,9 +1,9 @@
 #install necessary packages
-#these are the pakcages necessary to run the code
+#these are the packages necessary to run the code
 
 to.install<-c('tidyverse', 'labelled', 'haven', 'here', 'srvyr', 'survey', 'lubridate', 'readr', 'readxl', 'rvest', 'janitor', 'remotes')
 #This checks to see if these packages are installed.
-new.packages <- to.intsall[!(to.install %in% installed.packages()[,"Package"])]
+new.packages <- to.install[!(to.install %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
 #These packages *may* cause difficulty for people running R 4.0 on Windows. PLease contact Simon Kiss if that's the case
@@ -22,7 +22,7 @@ waterloo<-as_factor(waterloo)
 str(waterloo)
 ?read_excel
 
-#Genreate fake weight data
+#Generate fake weight data
 #There will be  a weight variable like this 
 waterloo$weight<-rnorm(1.5, sd=0.25, n=nrow(waterloo))
 summary(waterloo$weight)
