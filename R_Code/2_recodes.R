@@ -138,9 +138,9 @@ waterloo %>%
   mutate(hesitant=case_when(
     K7=="I certainly won't take it" ~ 1,
     K7=="I have already declined receiving it" ~ 1,
-    K7=="I probably won't take it" ~ 0.67,
+    K7=="I probably won't take it" ~ 0.75,
     K7=="I am not sure" ~ 0.5,
-    K7=="I probably will take it" ~ 0.33,
+    K7=="I probably will take it" ~ 0.25,
     K7==" I certainly will take it" ~ 0,
     K7=="I have already received it" ~ 0),
   )->waterloo
