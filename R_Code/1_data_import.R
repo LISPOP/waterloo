@@ -180,6 +180,6 @@ library(dplyr)
 polls_long %>% 
   filter(party!="other") %>% 
 ggplot(., aes(x=last_date_of_polling, y=vote_share, group=party, color=party)) +
-  geom_line() + scale_x_date(date_breaks="4 month", date_labels = "%B")+scale_color_mine(palette="ontario")
+  geom_line() + scale_x_date(date_breaks="4 month", date_labels = "%B")+scale_color_mine(palette="ontario")->polls_plot
 
 

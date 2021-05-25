@@ -3,7 +3,7 @@ title: "Summary of Waterloo Region Vote Intention, Spring 2021"
 author: 
   - "Simon J. Kiss"
 date: "05/05/2021"
-output: pdf_document
+output: word_document
 ---
 
 ```{r setup, include=T, echo=F, results="hide", message=F, warning=F}
@@ -12,9 +12,11 @@ knitr::opts_chunk$set(echo = TRUE, echo=F, results="hide", message=F, warning=F,
 ```
 
 ```{r run-code}
+
 library(here)
 library(wlucolors)
 source(here("R_Code", "4_analysis.R"))
+theme_set(theme_1)
 ```
 
 # Introduction
@@ -25,31 +27,95 @@ At this point, I would welcome any additional tips about additional cross-tabs p
 
 Right now these are all based on weighted data, which we will be provided. In addition, please note that the ideology variable is pretty crude. It is taken by summing each person's reported federal vote 2019, provincial vote 2019, and federal vote intention and provincial vote intention. Responses for the NDP were scored with 1, the Greens were scored 1.5, the Liberals scored with 2 and the Conservatives (PCs) scored with 3.
 
+\newpage
+
+# Polls
+
+We have grabbed the published polls for the recent period for Ontario. I thought it would be useful to compare the standing in Waterloo Region with provincial poll results at the same time period. 
+
+```{r polls-plot, fig.cap="Publicly available polls, Ontario. This can obviously be tweaked for appearance"}
+polls_plot
+```
+
 
 \newpage
+
 # Federal Vote
+
+
+
+```{r federal_vote_intention, fig.cap="Distribution of Federal Vote Intention, Waterloo Region 2021"}
+waterloo2 %>% 
+  group_by(vote_federal) %>% 
+  summarize(n=n()) %>% 
+  mutate(percent=n/(sum(n))*100) %>% 
+  filter(!is.na(vote_federal)) %>% 
+  ggplot(., aes(x=percent, y=fct_relevel(vote_federal, "Green", "NDP", "Conservative", "Liberal"), fill=vote_federal))+geom_col()+scale_fill_mine()+labs(y="Party", x="Percent")+xlim(c(0,50))
+```
+&nbsp;    
+&nbsp;   
+&nbsp;   
+&nbsp;   
+&nbsp;   
+&nbsp;   
+
 ```{r federal_vote_intention_2019_result, fig.cap="Federal Vote Intention By 2019 Result"}
 federal_vote_intention_2019_result
 ```
+
+&nbsp;   
+&nbsp;   
+&nbsp;   
+&nbsp;   
+&nbsp;   
+&nbsp;   
 
 ```{r federal_vote_intention_2019_historic, fig.cap="Federal Vote Intention By Historic Average"}
 federal_vote_intention_historic_average
 ```
 
+
 ```{r trudeau-approval-by-2019-vote, fig.cap="Approval of Trudeau handling by 2019 Vote"}
 trudeau_assessment_2019_vote
 ```
 
-\newpage
+
 # Provincial Vote
+
+
+
+```{r provincial_vote_intention, fig.cap="Distribution of Provincial Vote Intention, Waterloo Region 2019"}
+waterloo2 %>% 
+  group_by(vote_provincial) %>% 
+  summarize(n=n()) %>% 
+  mutate(percent=n/(sum(n))*100) %>% 
+  filter(!is.na(vote_provincial)) %>% 
+  ggplot(., aes(x=percent, y=fct_relevel(vote_provincial, "Green", "NDP", "Liberal", "PC"), fill=vote_provincial))+geom_col()+scale_fill_mine(palette="ontario")+ylab("Party")+xlab("Percent")+xlim(c(0,50))
+```
+
+&nbsp;  
+&nbsp;  
+&nbsp;  
+&nbsp;  
+&nbsp;  
 
 ```{r ford-approval-by-2018-vote, fig.cap="Provincial Vote Intention By 2018 Result"}
 provincial_vote_intention_2018_result
 ```
 
+&nbsp;   
+&nbsp;   
+&nbsp;   
+&nbsp;   
+
 ```{r provincial-vote-intention-2018-historic-average, fig.cap="Provincial Vote Intention By Historic Average"}
 provincial_vote_intention_historic_average
 ```
+&nbsp;   
+&nbsp;  
+&nbsp;  
+&nbsp;  
+&nbsp;  
 
 ```{r ford-assessment-2018-vote, fig.cap="Approval of Ford Handling by 2018 Vote"}
 ford_assessment_2018_vote

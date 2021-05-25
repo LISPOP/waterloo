@@ -11,11 +11,12 @@ theme_set(theme_minimal())
 #It can be sued 
 theme_1<-theme_minimal() + 
   theme(
-    axis.text.x = element_blank(),
-    axis.line.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.title=element_blank(),
-    legend.position="none"
+    # axis.text.x = element_blank(),
+    # axis.line.x = element_blank(),
+    # axis.ticks.x = element_blank(),
+    # axis.title=element_blank(),
+    #legend.position="none", 
+    plot.title=element_blank()
   )
 
 

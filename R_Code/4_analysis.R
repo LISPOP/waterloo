@@ -44,7 +44,7 @@ xlim(c(0,50))+
     #labs(title="Federal Vote Intention\nSpring 2021 Compared to Historic Levels of Support ")
 #This saves the plot out with a meaningful file name 
 ggsave(here("Plots", "vote_intention_historic_average.png"), width=6,height=3)
-recent_results
+
 
 #### 2021 Federal Support By Previous Election#### 
 waterloo2 %>% 
@@ -80,6 +80,7 @@ waterloo2 %>%
   labs(title="Federal Vote Intention by Past Election")+
   #This command turns off the legend that is printed 
   guides(text='none', fill='none') ->federal_vote_intention_2019_result
+
 ggsave(filename=here("Plots", "federal_vote_intention_2019_result.png"), width=6, height=3)
 
 #### 2021 provincial support by Provincial History#### 
@@ -121,14 +122,12 @@ waterloo2 %>%
   ggplot(., aes(y=Party, x=Percent, fill=Party, alpha=Variable))+
   #Dodge the barplot
   geom_col(position="dodge")+
-  #set theme to be minimal
-  theme_minimal()+
   #This uses my custom fill palette in order to set the colors to correspond to the parties
   scale_fill_mine()+
   #This reverses the order of the parties so that they run from Liberal, Conservative NDP to Green
   scale_y_discrete(limits=rev)+
   #This command turns off the legend that is printed 
-  guides(alpha='none')+labs(title="Vote Intention ")->provincial_vote_intention_2018_result
+  guides(alpha='none')+labs(title="Vote Intention")->provincial_vote_intention_2018_result
 #### Assessment by Vote####
 waterloo2 %>% 
   #Select federal vote and assessment of Trudeau in K3
@@ -147,12 +146,11 @@ waterloo2 %>%
   #graph
   #Set 2019 vote on y-axis, fill by the categories of the response variable
   #set the x to be the percent
-ggplot(., aes(y=`2019 Vote`, fill=K3, x=Percent))+
+ggplot(., aes(y=`2019 Vote`, fill=fct_rev(K3), order=fct_rev(K3), x=Percent))+
   #Because we have a y-value, we can use geom_col, not geom_bar()
   geom_col()+
   scale_y_discrete(limits=rev)+
-  scale_fill_mine(palette='wlu', name="Approval", rev=F)+
-  theme_minimal()->trudeau_assessment_2019_vote
+  scale_fill_mine(palette='wlu', name="Approval")->trudeau_assessment_2019_vote
 
 ggsave(filename=here("Plots", "covid_assessment_by_2019_vote_federal.png"))
 
@@ -166,7 +164,7 @@ waterloo2 %>%
   rename(., `2018 Vote`= vote_provincial) %>% 
   mutate(`2018 Vote`=fct_relevel(`2018 Vote`,  "PC", "Liberal","NDP", "Green")) %>% 
   filter(!is.na(`2018 Vote`)) %>% 
-  ggplot(., aes(y=`2018 Vote`, fill=K6, x=Percent))+geom_col()+scale_y_discrete(limits=rev)+scale_fill_mine(palette='wlu', name="Approval", rev=F)+theme_bw()->ford_assessment_2018_vote
+  ggplot(., aes(y=`2018 Vote`, fill=fct_rev(K6), order=fct_rev(K6),x=Percent))+geom_col()+scale_y_discrete(limits=rev)+scale_fill_mine(palette='wlu', name="Approval")->ford_assessment_2018_vote
 
 ggsave(filename=here("Plots", "covid_assessment_by_2018_vote_provincial.png"))
 
