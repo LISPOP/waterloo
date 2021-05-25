@@ -1,6 +1,6 @@
-source("R_Code/3_set_theme.R")
+source(here("R_Code", "3_set_theme.R"))
 #### Load wlucolors package #### 
-remotes::install_github('sjkiss/wlucolors', force=T)
+#remotes::install_github('sjkiss/wlucolors', force=T)
 library(wlucolors)
 
 #### 2021 Federal Support By Federal History #### 
@@ -40,7 +40,7 @@ xlim(c(0,50))+
   #This reverses the order of the parties so that they run from Liberal, Conservative NDP to Green
   scale_y_discrete(limits=rev)+
   #This command turns off the legend that is printed 
-  guides(text='none', fill='none', alpha='none') 
+  guides(text='none', fill='none', alpha='none') ->federal_vote_intention_historic_average
     #labs(title="Federal Vote Intention\nSpring 2021 Compared to Historic Levels of Support ")
 #This saves the plot out with a meaningful file name 
 ggsave(here("Plots", "vote_intention_historic_average.png"), width=6,height=3)
@@ -79,8 +79,9 @@ waterloo2 %>%
   #This command turns off the legend that is printed 
   labs(title="Federal Vote Intention by Past Election")+
   #This command turns off the legend that is printed 
-  guides(text='none', fill='none') 
+  guides(text='none', fill='none') ->federal_vote_intention_2019_result
 ggsave(filename=here("Plots", "federal_vote_intention_2019_result.png"), width=6, height=3)
+
 #### 2021 provincial support by Provincial History#### 
 waterloo2 %>% 
   group_by(vote_provincial) %>% 
@@ -91,7 +92,7 @@ waterloo2 %>%
   pivot_longer(., cols=c(2,5), values_to = c('Percent'), names_to=c("Variable")) %>% 
   mutate(Party=fct_relevel(Party, "PC","Liberal", "NDP", "Green")) %>% 
   ggplot(., aes(y=Party, x=Percent, fill=Party, alpha=Variable))+geom_col(position="dodge")+theme_bw()+
-  scale_fill_mine()+scale_y_discrete(limits=rev)
+  scale_fill_mine()+scale_y_discrete(limits=rev)->provincial_vote_intention_historic_average
 ggsave(here("Plots", "vote_intention_provincial_historic_average.png"), width=6,height=3)
 
 #### 2021 Provincial Support by 2018 Result #### 
@@ -127,7 +128,7 @@ waterloo2 %>%
   #This reverses the order of the parties so that they run from Liberal, Conservative NDP to Green
   scale_y_discrete(limits=rev)+
   #This command turns off the legend that is printed 
-  guides(alpha='none')+labs(title="Vote Intention ")
+  guides(alpha='none')+labs(title="Vote Intention ")->provincial_vote_intention_2018_result
 #### Assessment by Vote####
 waterloo2 %>% 
   #Select federal vote and assessment of Trudeau in K3
@@ -150,8 +151,8 @@ ggplot(., aes(y=`2019 Vote`, fill=K3, x=Percent))+
   #Because we have a y-value, we can use geom_col, not geom_bar()
   geom_col()+
   scale_y_discrete(limits=rev)+
-  scale_fill_mine(palette='wlu', name="Approval", rev=T)+
-  theme_minimal()
+  scale_fill_mine(palette='wlu', name="Approval", rev=F)+
+  theme_minimal()->trudeau_assessment_2019_vote
 
 ggsave(filename=here("Plots", "covid_assessment_by_2019_vote_federal.png"))
 
@@ -165,14 +166,17 @@ waterloo2 %>%
   rename(., `2018 Vote`= vote_provincial) %>% 
   mutate(`2018 Vote`=fct_relevel(`2018 Vote`,  "PC", "Liberal","NDP", "Green")) %>% 
   filter(!is.na(`2018 Vote`)) %>% 
-  ggplot(., aes(y=`2018 Vote`, fill=K6, x=Percent))+geom_col()+scale_y_discrete(limits=rev)+scale_fill_mine(palette='wlu', name="Approval", rev=T)+theme_bw()
+  ggplot(., aes(y=`2018 Vote`, fill=K6, x=Percent))+geom_col()+scale_y_discrete(limits=rev)+scale_fill_mine(palette='wlu', name="Approval", rev=F)+theme_bw()->ford_assessment_2018_vote
 
 ggsave(filename=here("Plots", "covid_assessment_by_2018_vote_provincial.png"))
 
 #### Correlate Ideology With Vaccine hesitancy #### 
  look_for(waterloo, "vaccine")
  levels(waterloo$K7)
- ggplot(., aes(x=ideology,y=hesitant))
-#### Demographics#### 
+ summary(waterloo$ideology)
+ ggplot(waterloo, aes(x=ideology,y=hesitant))+geom_point()+geom_smooth(method="loess")+xlim(c(1,3))->vaccine_hesitancy_ideology
+ ggsave(filename=here("Plots", "vaccine_hesitancy_by_ideology_formed_by_vote_intention_vote_history.png"))
+
+ #### Demographics#### 
 var_label(waterloo)
 

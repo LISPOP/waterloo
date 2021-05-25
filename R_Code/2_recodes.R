@@ -1,5 +1,5 @@
 
-source("R_Code/1_data_import.R")
+source(here("R_Code", "/1_data_import.R"))
 
 #### Recode Vote####
 lookfor(waterloo, "vote")
@@ -58,7 +58,6 @@ select(pid, cps19_lr_scale_bef_1) %>%
 ## set the party id variables levels to be according to hypothesized left-right ideology
 mutate(pid=fct_relevel(as_factor(pid),"NDP", "Green", "Bloc Québécois ", "Liberal", "Conservative")) %>% 
 ## Graph
-  install.packages("ggplot2")
 ggplot(., aes(x=pid, y=as.numeric(cps19_lr_scale_bef_1)))+geom_boxplot()
 ## Conclusion, the Greens could be put between the NDP and the LIberals
 
