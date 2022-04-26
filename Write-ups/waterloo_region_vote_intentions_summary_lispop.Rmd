@@ -1,0 +1,369 @@
+---
+title: "Summary of Waterloo Region Vote Intention, Spring 2021"
+
+author:
+- Simon Kiss^[Laurier Institute for the Study of Public Opinion and Policy, Wilfrid Laurier University]
+- Andrea Perrella^[Laurier Institute for the Study of Public Opinion and Policy, Wilfrid Laurier University]
+#- Steven Brown^[Laurier Institute for the Study of Public Opinion and Policy, Wilfrid Laurier University]
+- Anthony Piscitelli^[Laurier Institute for the Study of Public Opinion and Policy, Conestoga College]
+#- Jason Roy^[Laurier Institute for the Study of Public Opinion and Policy, Wilfrid Laurier University]
+date: "05/05/2021"
+
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: true
+---
+
+```{r setup, include=T, echo=F, results="hide", message=F, warning=F}
+library(knitr)
+library(kableExtra)
+opts_chunk$set(echo=F, results="hide", message=F, warning=F, fig.width=6, fig.height=2, cache=T, fig.pos="!H")
+
+```
+
+```{r run-code}
+#Note the script below installs two personal packages from Simon Kiss GitHub repository
+#once installed, the lines installing packages in 1_data_import.R should be commented out.
+source(here("R_Code", "4_analysis.R"))
+library(knitr)
+theme_set(theme_1)
+```
+# Headline Findings
+1. Liberals lead in Waterloo Region in spring, federally and provincially. Federally, **28\% of all respondents and 49\% of all decided respondents** said they would vote Liberal. The latter number is an increase of 11 percentage points over the Liberals' 2019 results in Waterloo Region. 
+
+2. Provincially, the Liberals lead, but the the gap was much smaller. **22\% of all respondents said they would support the Liberals compared to 18\%** for the PCs. This rose to 33\% for decided voters for the Liberals  and 29\% for the PCs. **This gap is just within the study's margin of error**
+
+2. Share of 2019 Liberal voters who approved of Justin Trudeau's handling of the pandemic was **13 percentage points** higher than the share of 2018 PC voters who of Doug Ford\'s handling of the pandemic (73\% versus 60\%) (see Tables \@ref(tab:approval1) and \@ref(tab:approval2)). **Trudeau had better evaluations from his most recent voters than Ford did.**
+
+3. Controlling for past federal and provincial votes, **approval of handling the pandemic** was a significant predictor of whether a voter would vote for both parties (see Tables \@ref(tab:trudeauregression), \@ref(tab:fordregression))
+ 
+4. Conclusion: The Trudeau government's handling of the pandemic helped its political standings and the Ford government's handling of the pandemic hurt its chances in Waterloo Region. 
+5. Waterloo Region is an important bellwether set of ridings in Ontario.  Table \@ref(tab:bellwether1) and \@ref(tab:bellwether2) show the number of ridings since 2003 in provincial and general elections that have returned members whose party formed the government.  
+
+
+
+# Study details
+ - Survey of  voters in Waterloo Region via cell, landline and web
+ - Conducted by the University of Waterloo Survey Research Center
+ - Sampled `r nrow(waterloo)` residents`
+ - Margin of error associated with a survey this size is +/- `r round(1.96*(sqrt(0.25/nrow(waterloo))),2)*100` percentage points
+ - Survey overrepresented women (54\% of the sample), over educated (46\% of the sample with degrees, v. 25\% in the population) and older people (30\% and 20\% were men and women over 65 in the sample, versus 17\% and 19% of the population). Sample was very closely matched geographically.
+ - Weights have been calculated to ensure the sample is matched on sex, education and age. 
+ - Survey dates were from `r format(min(lubridate::ymd(waterloo$SurveyDate)), "%B %d %Y")` to `r format(max(lubridate::ymd(waterloo$SurveyDate)), "%B %d %Y")`. This covered the start of the third wave and the provincial government's most recent stay-at home order of April 7th, 2021.
+ - More details available from the authors technical documentation
+
+
+
+# Federal Vote Intention, Spring 2021
+
+Figure \@ref(fig:federal-vote-intention) shows the weighted federal vote intention of all voters, *including undecided voters*, in Waterloo Region, spring 2021.
+
+```{r federal-vote-intention, fig.cap="Distribution of Federal Vote Intention, Waterloo Region 2021"}
+
+waterloo2 %>% 
+  group_by(vote_federal2) %>% 
+  summarize(n=survey_total()) %>% 
+  mutate(percent=n/(sum(n))*100) %>% 
+  filter(!is.na(vote_federal2)) %>% 
+  ggplot(., aes(x=percent, y=fct_relevel(vote_federal2, "Undecided", "Green", "NDP", "Conservative", "Liberal"), fill=vote_federal2))+geom_text(aes(y=vote_federal2, x=percent,label=round(percent)),alpha=1,position=position_dodge(width=0.9), hjust=-0.1)+
+  geom_col()+scale_fill_mine(name="Federal Vote", palette="roc_undecided")+labs(y="Party", x="Percent")+xlim(c(0,50))+guides(fill="none") + scale_y_discrete(limits=rev)+theme_1
+ggsave(filename=here("Plots", "2021_federal_vote_intention.png"))
+
+```
+
+
+Figure \@ref(fig:federal-vote-intention2) shows the weighted federal vote intention in Waterloo Region, spring 2021, *excluding* undecided voters.
+
+```{r federal-vote-intention2, fig.cap="Distribution of Federal Vote Intention, Decided Voters Only, Waterloo Region 2021"}
+waterloo2 %>% 
+  group_by(vote_federal1) %>% 
+  summarize(n=survey_total()) %>% 
+  filter(!is.na(vote_federal1)) %>% 
+  mutate(percent=n/(sum(n))*100) %>% 
+  filter(!is.na(vote_federal1)) %>% 
+  ggplot(., aes(x=percent, y=fct_relevel(vote_federal1, "Undecided", "Green", "NDP", "Conservative", "Liberal"), fill=vote_federal1))+geom_text(aes(y=vote_federal1, x=percent,label=round(percent)),alpha=1,position=position_dodge(width=0.9), hjust=-0.1)+
+  geom_col()+scale_fill_mine(name="Federal Vote", palette="roc")+labs(y="Party", x="Percent")+xlim(c(0,50))+guides(fill="none") + scale_y_discrete(limits=rev)+theme_1
+ggsave(filename=here("Plots", "2021_federal_vote_intention.png"))
+
+```
+
+\clearpage
+
+
+
+```{r show-federal-past-results, eval=F}
+validated_results_federal
+validated_results_federal %>% 
+  filter(Level=="Federal") %>% 
+    rename(., "Percent"="pct") %>% 
+  pivot_longer(cols=c("Percent", `Past Regional Average`), names_to="Variable", values_to="Percent") %>% 
+  mutate(Party=fct_relevel(Party, "Liberal", "Conservative", "NDP", "Green")) %>% 
+  ggplot(., aes(y=Party, x=Percent, fill=Party, alpha=Variable))+
+  geom_col(position="dodge", aes(alpha=Variable))+
+  geom_text(aes(y=Party, x=Percent,label=round(Percent)),alpha=1,position=position_dodge(width=0.9), hjust=-0.1)+
+  scale_y_discrete(limits=rev)+
+  scale_fill_mine(palette = "federal")+
+  guides(fill="none", text="none")
+
+```
+
+
+```{r federal-vote-2019, fig.cap="Federal Vote Intention By 2019 Result"}
+federal_vote_intention_2019_result
+```
+
+To add a bit of context we can compare these with the last election's results.
+Figure \@ref(fig:federal-vote-2019) shows the current results of *decided* voters only, compared to the results of the 2019 federal election. Note that the Liberals were eight points ahead than their 2019 results, while the Conservatives were behind their past results.
+
+Lastly, we can also compare the spring survey of voters with the historic average levels of support received by the parties in Waterloo Region.  Figure \@ref(fig:federal-2019-historic) shows this, including only *decided voters*.
+
+```{r federal-2019-historic, fig.cap="Federal Vote Intention Compared To Historic Averages"}
+
+federal_vote_intention_historic_average
+
+
+```
+
+
+\newpage
+
+## Assessment Of Federal Handling Of The Pandemic
+
+Table \@ref(tab:trudeauapproval) shows that 61\% of the respondents approved of how Trudeau had handled the pandemic. 
+
+```{r trudeau-weighted-approval, results="asis"}
+
+kable(prop.table(wtd.table(x=waterloo$trudeau_approval_cat, normwt=T))*100, digits=0, col.names=c("Approval", "Pct"), label="trudeauapproval", caption="Support For Trudeau\'s Handling of The Pandemic")
+
+```
+
+If we break it out by vote intention, obviously we get different results. Figure  \@ref(fig:trudeau-approval-by-2019-vote) shows the assessment of Prime Minister Justin Trudeau\'s handling of the pandemic by reported vote in the 2021 federal election. 
+
+```{r trudeau-approval-by-2019-vote, fig.cap="Approval of Trudeau handling by 2021 Vote Intention"}
+trudeau_assessment_2021_vote+geom_vline(xintercept=50, linetype=2)
+```
+
+
+More specifically, table \@ref(tab:approval1) shows that 73\% of people who voted Liberal and 16\% of people who voted Conservative approved of the job that Justin Trudeau has done handling the pandemic. 
+
+
+
+```{r trudeau-approval-2019-vote-categorical, results="asis"}
+
+rprop(wtd.table(waterloo$past_vote_federal2, waterloo$trudeau_approval_cat, weights=waterloo$weighting), total=F, digits=F) %>% 
+  { kable(.[,c(1,3,2)], digits=0, caption="Approval of Trudeau's Handling Of The Pandemic By Past Vote", label="approval1") } %>% kable_styling(latex_options = "hold_position")
+
+```
+
+
+\newpage 
+
+
+
+# Provincial Vote
+
+Figure \@ref(fig:provincial-vote-intention) shows the distribution of the provincial vote intention, *including undecided voters*. 
+
+```{r provincial-vote-intention, fig.cap="Distribution of Provincial Vote Intention, Waterloo Region 2019"}
+
+waterloo2 %>% 
+  group_by(vote_provincial2) %>% 
+  summarize(n=n()) %>% 
+    filter(!is.na(vote_provincial2)) %>% 
+  mutate(percent=n/(sum(n))*100) %>% 
+  ggplot(., aes(x=percent, y=fct_relevel(vote_provincial2, "Undecided", "Green", "NDP", "Liberal", "PC"), fill=vote_provincial2))+geom_col()+scale_fill_mine(palette="ontario_undecided", name="Provincial Vote")+ylab("Party")+xlab("Percent")+xlim(c(0,50))+
+  geom_text(aes(x=percent, y=vote_provincial2, label=round(percent)), position=position_dodge(width=0.9), hjust=-0.5)+guides(fill="none")
+ggsave(filename=here("Plots", "2021_provincial_vote_intention.png"))
+```
+
+
+```{r provincial-vote-intention-decided, fig.cap="Distribution of Provincial Vote Intention, Waterloo Region 2019, Decided Voters Only"}
+
+waterloo2 %>% 
+  group_by(vote_provincial1) %>% 
+  summarize(n=n()) %>% 
+    filter(!is.na(vote_provincial1)) %>% 
+  mutate(percent=n/(sum(n))*100) %>% 
+  ggplot(., aes(x=percent, y=fct_relevel(vote_provincial1,  "Green", "NDP", "Liberal", "PC"), fill=vote_provincial1))+geom_col()+scale_fill_mine(palette="ontario", name="Provincial Vote")+ylab("Party")+xlab("Percent")+xlim(c(0,50))+
+  geom_text(aes(x=percent, y=vote_provincial1, label=round(percent)), position=position_dodge(width=0.9), hjust=-0.5)+guides(fill="none")
+ggsave(filename=here("Plots", "2021_provincial_vote_intention_decided.png"))
+```
+
+Figure \@ref(fig:ford-approval-by-2018-vote) shows the current provincial vote intention *amongst decided voters* compared to the 2018 results. The Liberals have almost doubled their support amongst decided voters; the NDP have lost more than half their supporters.
+
+```{r ford-approval-by-2018-vote, fig.cap="Provincial Vote Intention By 2018 Result"}
+provincial_vote_intention_2018_result
+```
+
+
+Figure \@ref(fig:provincial-vote-intention-2018-historic-average) shows the current voting intention by the parties' historic averages in Waterloo region. 
+
+```{r provincial-vote-intention-2018-historic-average, fig.cap="Provincial Vote Intention By Historic Average"}
+provincial_vote_intention_historic_average
+```
+
+
+\clearpage
+
+
+Table \@ref(tab:fordapproval) shows that 61\% of the respondents approved of how Ford had handled the pandemic. 
+
+```{r ford-weighted-approval, results="asis"}
+
+kable(prop.table(wtd.table(x=waterloo$ford_approval_cat, normwt=T))*100, digits=0, col.names=c("Approval", "Pct"), label="fordapproval", caption="Support For Ford\'s Handling of The Pandemic")
+
+```
+
+Figure \@ref(fig:ford-assessment-2018-vote) shows the distribution of approval of Ford's handling of the pandemic by 2022 vote intention.
+
+```{r ford-assessment-2018-vote, fig.cap="Approval of Ford Handling by 2022 Provincial Vote Intention"}
+ford_assessment_2018_vote+geom_vline(xintercept=50, linetype=2)
+```
+
+Table \@ref(tab:approval2)  shows that 61\% of past PC voters approve of the job that Ford is doing, while only 51% of Liberal voters and only 29\% of past NDP voters approve.
+
+```{r ford-approval-2019-vote-categorical, results="asis"}
+
+rprop(wtd.table(waterloo$past_vote_provincial2, waterloo$ford_approval_cat, weights=waterloo$weighting), total=F, digits=F) %>% 
+  {kable(.[,c(1,3,2)], digits=0, caption="Approval of Doug Ford's Handling Of Pandemic By 2018 Past Vote", label="approval2")}
+
+```
+
+
+\newpage
+
+<!-- # Summary of Impact of Pandemic Approval  -->
+
+<!-- Table \@ref(tab:fordtrudeauapproval) shows the comparative approval ratings for Justin Trudeau and Doug Ford. Respondents were asked whether they approved or disapproved of each government's handling of the pandemic. -->
+
+```{r truduea-pandemic-approval, eval=F}
+ford_approval<-round(prop.table(wtd.table(waterloo$ford_approval_cat, normwt=T, digits=0))*100)
+trudeau_approval<-round(prop.table(wtd.table(waterloo$trudeau_approval_cat, normwt=T, digits=0, weights=waterloo$weighting))*100,0) 
+ford_approval %>% 
+  bind_rows(., trudeau_approval) %>% 
+  mutate(Politician=c('Ford', 'Trudeau')) %>% 
+select(4, 1,3,2) %>% 
+  kable(., col.names=c("", "Approve", "Neither", "Disapprove"), caption="Approval of Ford and Trudeau government\'s Handling of Pandemic", label="fordtrudeauapproval")
+
+  
+```
+  
+  
+```{r pandemic-impact-trudeau, results="asis", eval=F}
+rprop(wtd.table(waterloo$past_vote_federal3, waterloo$trudeau_approval_cat,normwt=T, weights=waterloo$weighting), total=F, n=T) %>% 
+  { kable(.[,c(1,3,2)], caption="Approval of Trudeau Pandemic Handling By Dichotomous 2019 Vote", label="pandemic1", digits=0) } 
+```
+
+```{r pandemic-impact-ford, results="asis", eval=F}
+
+rprop(wtd.table(waterloo$past_vote_provincial3, waterloo$ford_approval_cat,normwt=T, weights=waterloo$weighting), total=F, n=T) %>% 
+  { kable(.[,c(1,3,2)], caption="Approval of Ford Pandemic Handling By Dichotomous 2018 Vote", label="pandemic2", digits=0) } 
+
+```
+
+```{r make-models}
+fed1<-lm(vote_federal3~past_vote_federal3, data=waterloo)
+fed2<-update(fed1, .~.+past_vote_provincial3, data=waterloo)
+fed3<-update(fed2, .~.+skpersonal::revScale(as.numeric(trudeau_approval)))
+summary(fed1)
+
+prov1<-lm(vote_provincial3~past_vote_provincial3, data=waterloo)
+prov2<-update(prov1, .~.+past_vote_federal3, data=waterloo)
+prov3<-update(prov2, .~.+skpersonal::revScale(as.numeric(ford_approval)))
+summary(prov1)
+```
+
+```{r federal-model, results="asis",xtable.comment = FALSE, comment=""}
+library(stargazer)
+stargazer(fed1, fed2, fed3, covariate.labels=c("Past Federal Vote\\\\(Liberals versus Others)", "Past Provincial Vote\\\\(PCs and thers) ", "Trudeau Pandemic Approval"), title="2021 Federal Vote Intention As A Function of 2019 Federal Vote, 2018 Provincial Vote And Approval of Justin Trudeau\'s Handling of the Pandemic", header=F, digits=2, dep.var.labels="Liberal Vote in 2021", label="tab:trudeauregression")
+```
+
+
+```{r provincial-model, results="asis",xtable.comment = FALSE, comment=""}
+library(stargazer)
+stargazer(prov1, prov2, prov3, covariate.labels=c("Past Provincial Vote\\\\(PCs and Others) ","Past Federal Vote\\\\(Liberals versus Others)",  "Ford Pandemic Approval"), title="2022 Provincial Vote Intention As A Function of 2018 Provincial Vote, 2019 Federal Vote And Approval of Justin Trudeau\'s Handling of the Pandemic", header=F, digits=2, dep.var.labels="PC Vote in 2022", label="tab:fordregression")
+```
+
+# Vaccine Hesitancy
+
+
+```{r vaccine-hesitant, results="asis"}
+library(srvyr)
+rprop(wtd.table(waterloo$past_vote_provincial2, waterloo$hesitant2, weights=waterloo$weighting, normwt=T), total=F, n=T) %>% 
+  kable(., caption="Vaccine Hesitancy by 2018 Vote", label="hesitant", digits=0)
+
+  
+```
+
+```{r vaccine-hesitancy-ideology, fig.cap="Correlation of Vaccine Hesitancy By Ideology",eval=F}
+vaccine_hesitancy_ideology+geom_smooth(method="lm")
+```
+
+\newpage
+
+
+
+
+\newpage
+
+```{r federal-vote-demographics,results="asis", eval=F}
+library(knitr)
+library(questionr)
+#Define the vector of variables
+demos<-c("Sex", "Income", "Marital", "Degree", "Age")
+map(demos, function(x) tabs(df=waterloo, x="vote_federal1", y=x, weight="weighting")) %>% 
+  kable() %>% 
+  cat("\n")
+## Provincial Vote Intention
+```
+
+\newpage
+
+
+```{r provincial-vote-demographics,results="asis", eval=F}
+library(knitr)
+library(questionr)
+#Define the vector of variables
+demos<-c("Sex", "Income", "Marital", "Degree", "Age")
+map(demos, function(x) tabs(df=waterloo, x="vote_provincial1", y=x, weight="weighting")) %>% 
+  kable() %>% 
+  cat("\n")
+## Provincial Vote Intention
+```
+
+
+# Waterloo Region As Bellwether
+
+
+```{r provincial-bellwether, results="asis", eval=T}
+
+history %>% 
+  group_by(Year,Level) %>%
+add_tally(n_distinct(`District Name`)) %>% 
+  filter(Level=="Provincial") %>% 
+  group_by(Year, n, winner_form_government) %>% 
+  filter(winner_form_government==1) %>% 
+  summarize(n_winner=n()) %>% 
+  mutate(Percent=(n_winner/n)*100) %>% 
+  select(-3) %>% 
+  kable(., digits=0, caption="Waterloo Region Ridings As Provincial Bellwether", col.names=c("Year", "# Ridings", "# of Government MPPS", "Percent"), label="bellwether1")%>% kable_styling(latex_options = "hold_position")
+
+```
+
+
+```{r federal-bellwether, results="asis", eval=T}
+history %>% 
+  group_by(Year,Level) %>%
+add_tally(n_distinct(`District Name`)) %>% 
+  filter(Level=="Federal") %>% 
+  group_by(Year, n, winner_form_government) %>% 
+  filter(winner_form_government==1) %>%
+  summarize(n_winner=n()) %>%
+  mutate(Percent=(n_winner/n)*100) %>%
+  select(-3) %>% 
+kable(., digits=1, caption="Waterloo Region Ridings As Federal Bellwether",label="bellwether2", col.names=c("Year", "# Ridings", "# of Government MPPS", "Percent"))%>% kable_styling(latex_options = "hold_position")
+
+
+```
+ 
